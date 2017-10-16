@@ -1,0 +1,233 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "description": "Audio Backend API for AGL applications",
+        "title": "audio backend",
+        "version": "1.0",
+        "x-binding-c-generator": {
+            "api": "audiod",
+            "version": 2,
+            "prefix": "audiod_",
+            "postfix": "",
+            "start": null,
+            "onevent": "AudioDOnEvent",
+            "init": "AudioDBindingInit",
+            "scope": "",
+            "private": false
+        }
+    },
+    "servers": [
+        {
+            "url": "ws://{host}:{port}/api/audiod",
+            "description": "Audio Backend API for AGL applications.",
+            "variables": {
+                "host": {
+                    "default": "localhost"
+                },
+                "port": {
+                    "default": "1234"
+                }
+            },
+            "x-afb-events": [
+                {
+                    "$ref": "#/components/schemas/afb-event"
+                }
+            ]
+        }
+    ],
+    "components": {
+        "schemas": {
+            "afb-reply": {
+                "$ref": "#/components/schemas/afb-reply-v2"
+            },
+            "afb-event": {
+                "$ref": "#/components/schemas/afb-event-v2"
+            },
+            "afb-reply-v2": {
+                "title": "Generic response.",
+                "type": "object",
+                "required": ["jtype", "request"],
+                "properties": {
+                    "jtype": {
+                        "type": "string",
+                        "const": "afb-reply"
+                    },
+                    "request": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": {
+                            "status": {
+                                "type": "string"
+                            },
+                            "info": {
+                                "type": "string"
+                            },
+                            "token": {
+                                "type": "string"
+                            },
+                            "uuid": {
+                                "type": "string"
+                            },
+                            "reqid": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "response": {
+                        "type": "object"
+                    }
+                }
+            },
+            "afb-event-v2": {
+                "type": "object",
+                "required": ["jtype", "event"],
+                "properties": {
+                    "jtype": {
+                        "type": "string",
+                        "const": "afb-event"
+                    },
+                    "event": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "200": {
+                "description": "A complex object array response",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/afb-reply"
+                        }
+                    }
+                }
+            },
+            "400": {
+                "description": "Invalid arguments"
+            }
+        }
+    },    
+    "paths": {
+        "/play": {
+            "description": "Open an ALSA PCM Device name and Play the associate media wave file",
+            "get": {
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "device_name",
+                        "required": true,
+                        "schema": { "type": "string" }
+                    },
+                    {
+                        "in": "query",
+                        "name": "filepath",
+                        "required": true,
+                        "schema": { "type": "string" }
+                    },
+                    {
+                        "in": "query",
+                        "name": "loop",
+                        "required": true,
+                        "schema": { "type": "int" }
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/components/responses/200" },
+                    "400": { "$ref": "#/components/responses/400" }
+                }
+            }
+        },
+        "/stop": {
+            "description": "Stop and close the playing Alsa Device",
+            "get": {
+                "responses": {
+                    "200": { "$ref": "#/components/responses/200" },
+                    "400": { "$ref": "#/components/responses/400" }
+                }
+            }
+        },
+        "/pause": {
+            "description": "Pause a playing stream",
+            "get": {
+                "responses": {
+                    "200": { "$ref": "#/components/responses/200" },
+                    "400": { "$ref": "#/components/responses/400" }
+                }
+            }
+        },
+        "/subscribe": {
+            "description": "Subscribe to audio events",
+            "get": {
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "events",
+                        "required": true,
+                        "schema": { "type": "array",
+                        "items": { "type": "string" }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/components/responses/200" },
+                    "400": { "$ref": "#/components/responses/400" }
+                }
+            }
+        },
+        "/unsubscribe": {
+            "description": "Unubscribe to audio events",
+            "get": {
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "events",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/components/responses/200" },
+                    "400": { "$ref": "#/components/responses/400" }
+                }
+            }
+        },
+        "/post_event": {
+            "description": "Push an event to AGL",
+            "get": {
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "event_name",
+                        "required": true,
+                        "schema": { "type": "string" }
+                    },
+                    {
+                        "in": "query",
+                        "name": "event_parameter",
+                        "required": true,
+                        "schema": { 
+                                    "type": "object",
+                                    "required": [ "speed"],
+                                    "properties": {
+                                    "speed": { "type": "int" }
+                                 }   
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/components/responses/200" },
+                    "400": { "$ref": "#/components/responses/400" }
+                }
+            }
+        },        
+    }
+}
